@@ -429,7 +429,8 @@ namespace Com.Co.D3.AccesoDatos.AccesoDatosFormasIntimas
                         string idMoneda = string.IsNullOrEmpty(pedido.idMoneda) ? "1" : pedido.idMoneda;
                         Query.Parameters.AddWithValue("@idMoneda", idMoneda);
                         Query.Parameters.AddWithValue("@idVendedor", pedido.idVendedor);
-                        Query.Parameters.AddWithValue("@strOrdendeCompra", pedido.strOrdendeCompra);
+                        string strOrdendeCompra = string.IsNullOrEmpty(pedido.strOrdendeCompra) ? "OC:" : pedido.strOrdendeCompra;
+                        Query.Parameters.AddWithValue("@strOrdendeCompra", strOrdendeCompra);
                         Query.Parameters.AddWithValue("@strTipoOrdendeCompra", pedido.strTipoOrdendeCompra);
                         Query.Parameters.AddWithValue("@memObservaciones", pedido.memObservaciones);
                         Query.Parameters.Add("@dtmFecPedido", SqlDbType.DateTime).Value = DateTime.Parse(pedido.dtmFecPedido);
@@ -453,25 +454,28 @@ namespace Com.Co.D3.AccesoDatos.AccesoDatosFormasIntimas
 
                         int numPedido = (int)Query.ExecuteScalar();
 
-                        foreach (DetallePedido detallePedido in pedido.detallesPedido)
+                        if (numPedido != -1)
                         {
-                            using (SqlCommand queryDetallePedido = new SqlCommand("SP_setPedidoDetalles", con))
+                            foreach (DetallePedido detallePedido in pedido.detallesPedido)
                             {
-                                queryDetallePedido.Parameters.AddWithValue("@numPedido", numPedido);
-                                queryDetallePedido.Parameters.AddWithValue("@idSucursal", detallePedido.idSucursal);
-                                queryDetallePedido.Parameters.AddWithValue("@idVendedor", detallePedido.idVendedor);
-                                queryDetallePedido.Parameters.AddWithValue("@strReferencia", detallePedido.strReferencia);
-                                queryDetallePedido.Parameters.AddWithValue("@curPrecio", detallePedido.curPrecio);
-                                queryDetallePedido.Parameters.AddWithValue("@intCantidadPedida", detallePedido.intCantidadPedida);
-                                string intConujunto = string.IsNullOrEmpty(detallePedido.intConjunto) ? "0" : detallePedido.intConjunto;
-                                queryDetallePedido.Parameters.AddWithValue("@intConjunto", intConujunto);
-                                queryDetallePedido.Parameters.AddWithValue("@strColor", detallePedido.strColor);
-                                queryDetallePedido.Parameters.AddWithValue("@strTalla", detallePedido.strTalla);
-                                queryDetallePedido.Parameters.Add("@dtmFecCreacion", SqlDbType.DateTime).Value = DateTime.Parse(detallePedido.dtmFecCreacion);
+                                using (SqlCommand queryDetallePedido = new SqlCommand("SP_setPedidoDetalles", con))
+                                {
+                                    queryDetallePedido.Parameters.AddWithValue("@numPedido", numPedido);
+                                    queryDetallePedido.Parameters.AddWithValue("@idSucursal", detallePedido.idSucursal);
+                                    queryDetallePedido.Parameters.AddWithValue("@idVendedor", detallePedido.idVendedor);
+                                    queryDetallePedido.Parameters.AddWithValue("@strReferencia", detallePedido.strReferencia);
+                                    queryDetallePedido.Parameters.AddWithValue("@curPrecio", detallePedido.curPrecio);
+                                    queryDetallePedido.Parameters.AddWithValue("@intCantidadPedida", detallePedido.intCantidadPedida);
+                                    string intConujunto = string.IsNullOrEmpty(detallePedido.intConjunto) ? "0" : detallePedido.intConjunto;
+                                    queryDetallePedido.Parameters.AddWithValue("@intConjunto", intConujunto);
+                                    queryDetallePedido.Parameters.AddWithValue("@strColor", detallePedido.strColor);
+                                    queryDetallePedido.Parameters.AddWithValue("@strTalla", detallePedido.strTalla);
+                                    queryDetallePedido.Parameters.Add("@dtmFecCreacion", SqlDbType.DateTime).Value = DateTime.Parse(detallePedido.dtmFecCreacion);
 
-                                queryDetallePedido.CommandType = CommandType.StoredProcedure;
+                                    queryDetallePedido.CommandType = CommandType.StoredProcedure;
 
-                                queryDetallePedido.ExecuteNonQuery();
+                                    queryDetallePedido.ExecuteNonQuery();
+                                }
                             }
                         }
                     }
